@@ -1,0 +1,8 @@
+{
+  "name": "Shelter",
+  "description": "A personal portal web app combining a tools directory, social feed, web-based multiplayer games, AI chat, voice lobby, and a smart timetable planner.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
