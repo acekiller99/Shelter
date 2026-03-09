@@ -7,27 +7,27 @@ test.describe('Navigation', () => {
         // Test Tools page
         await page.getByRole('link', { name: 'Tools' }).click();
         await expect(page).toHaveURL('/tools');
-        await expect(page.getByText('Recommended Tools')).toBeVisible();
+        await expect(page.getByRole('heading', { name: 'Recommended Tools' })).toBeVisible();
 
         // Test Games page
         await page.getByRole('link', { name: 'Games' }).click();
         await expect(page).toHaveURL('/games');
-        await expect(page.getByText('Game Center')).toBeVisible();
+        await expect(page.getByRole('heading', { name: 'Game Center' })).toBeVisible();
 
         // Test Chat page
         await page.getByRole('link', { name: 'Chat' }).click();
         await expect(page).toHaveURL('/chat');
-        await expect(page.getByText('Messages')).toBeVisible();
+        await expect(page.getByRole('heading', { name: 'Messages' })).toBeVisible();
 
         // Test Timetable page
         await page.getByRole('link', { name: 'Timetable' }).click();
         await expect(page).toHaveURL('/timetable');
-        await expect(page.getByText('Timetable & Targets')).toBeVisible();
+        await expect(page.getByRole('heading', { name: 'Timetable & Targets' })).toBeVisible();
 
         // Test News page
         await page.getByRole('link', { name: 'News' }).click();
         await expect(page).toHaveURL('/news');
-        await expect(page.getByText('News & Updates')).toBeVisible();
+        await expect(page.getByRole('heading', { name: 'News & Updates' })).toBeVisible();
 
         // Test Profile page
         await page.getByRole('link', { name: 'Profile' }).click();
@@ -36,12 +36,12 @@ test.describe('Navigation', () => {
         // Test Settings page
         await page.getByRole('link', { name: 'Settings' }).click();
         await expect(page).toHaveURL('/settings');
-        await expect(page.getByText('Settings')).toBeVisible();
+        await expect(page.getByRole('heading', { name: 'Settings' })).toBeVisible();
 
         // Test Feed (home) page
         await page.getByRole('link', { name: 'Feed' }).click();
         await expect(page).toHaveURL('/');
-        await expect(page.getByText('Feed')).toBeVisible();
+        await expect(page.getByRole('heading', { name: 'Feed' })).toBeVisible();
     });
 
     test('sidebar highlights active page', async ({ page }) => {

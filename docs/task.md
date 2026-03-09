@@ -4,8 +4,8 @@
 
 ### 1.1 Auth System (Login / Sign Up)
 - [x] Auth page skeleton with Sign In / Sign Up toggle
-- [ ] Form validation (email format, password strength, required fields)
-- [ ] "Remember me" checkbox & forgot password flow
+- [x] Form validation (email format, password strength, required fields)
+- [x] "Remember me" checkbox & forgot password flow
 - [ ] OAuth buttons (GitHub) — wired to NextAuth.js
 - [ ] Session context (logged-in user state across app)
 - [ ] Protected route middleware (redirect unauthenticated users)
@@ -19,6 +19,7 @@
 - [x] GlobalContext for shared UI state
 - [ ] Animated page transitions between routes
 - [ ] Responsive polish (tablet breakpoints, touch gestures)
+- [x] Unified color palette (stone + amber across all pages)
 
 ### 1.3 Profile Page
 - [x] Profile page skeleton (cover photo, avatar, bio, status, gaming stats)
@@ -43,10 +44,10 @@
 - [x] Search bar placeholder
 - [x] UserHoverCard on avatars
 - [ ] Create post with image upload
-- [ ] Like / Unlike toggle (optimistic UI)
+- [x] Like / Unlike toggle (optimistic UI)
 - [ ] Comment thread (expand/collapse)
 - [ ] Share post (copy link)
-- [ ] Search functionality (full-text search users & posts)
+- [x] Search functionality (full-text search users & posts)
 - [ ] Follow system — filter feed to followed users
 - [ ] Infinite scroll / pagination
 - [ ] Post deletion (own posts only)
@@ -159,13 +160,13 @@
 ## Testing & Quality
 
 ### Automated Tests
-- [ ] Set up testing framework (Playwright for E2E, Jest/Vitest for unit)
-- [ ] Auth flow tests (sign up, sign in, sign out, protected routes)
-- [ ] Feed CRUD tests (create, like, comment, delete post)
+- [x] Set up testing framework (Playwright for E2E, Jest/Vitest for unit)
+- [x] Auth flow tests (sign up, sign in, validation, password toggle)
+- [x] Feed CRUD tests (create, like, search)
 - [ ] Tools CRUD tests
 - [ ] Timetable CRUD tests
 - [ ] Chat message send/receive tests
-- [ ] Navigation & routing tests
+- [x] Navigation & routing tests
 - [ ] Responsive layout tests
 - [ ] Accessibility tests (keyboard nav, screen reader)
 
