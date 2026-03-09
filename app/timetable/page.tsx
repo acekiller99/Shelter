@@ -24,27 +24,27 @@ export default function Timetable() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-white" style={{ fontFamily: 'var(--font-display)' }}>Timetable & Targets</h1>
-          <p className="text-slate-400 mt-1">Plan your day and achieve your goals with AI</p>
+          <p className="text-stone-400 mt-1">Plan your day and achieve your goals with AI</p>
         </div>
-        
+
         <div className="flex items-center gap-3">
-          <button 
+          <button
             onClick={() => setIsPublic(!isPublic)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors border ${isPublic ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200'}`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors border ${isPublic ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : 'bg-stone-800 text-stone-400 border-stone-700 hover:text-stone-200'}`}
           >
             {isPublic ? <Globe size={16} /> : <Lock size={16} />}
             {isPublic ? 'Public' : 'Private'}
           </button>
-          <div className="flex bg-slate-800 p-1 rounded-xl border border-slate-700">
-            <button 
+          <div className="flex bg-stone-800 p-1 rounded-xl border border-stone-700">
+            <button
               onClick={() => setView('day')}
-              className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-colors ${view === 'day' ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'}`}
+              className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-colors ${view === 'day' ? 'bg-stone-700 text-white shadow-sm' : 'text-stone-400 hover:text-stone-200'}`}
             >
               Day
             </button>
-            <button 
+            <button
               onClick={() => setView('month')}
-              className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-colors ${view === 'month' ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'}`}
+              className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-colors ${view === 'month' ? 'bg-stone-700 text-white shadow-sm' : 'text-stone-400 hover:text-stone-200'}`}
             >
               Month
             </button>
@@ -58,33 +58,33 @@ export default function Timetable() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Calendar View */}
-        <div className="lg:col-span-2 bg-slate-900 rounded-3xl p-6 shadow-lg border border-slate-800">
+        <div className="lg:col-span-2 bg-stone-900 rounded-3xl p-6 shadow-lg border border-stone-800">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold flex items-center gap-2 text-white">
               <CalendarIcon size={24} className="text-cyan-400" />
               {view === 'day' ? 'Today\'s Schedule' : 'October 2023'}
             </h2>
             <div className="flex gap-2">
-              <button className="p-2 hover:bg-slate-800 rounded-full transition-colors text-slate-400 hover:text-white">
+              <button className="p-2 hover:bg-stone-800 rounded-full transition-colors text-stone-400 hover:text-white">
                 <ChevronLeft size={20} />
               </button>
-              <button className="p-2 hover:bg-slate-800 rounded-full transition-colors text-slate-400 hover:text-white">
+              <button className="p-2 hover:bg-stone-800 rounded-full transition-colors text-stone-400 hover:text-white">
                 <ChevronRight size={20} />
               </button>
             </div>
           </div>
-          
+
           {view === 'day' ? (
-            <div className="space-y-4 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-700 before:to-transparent">
+            <div className="space-y-4 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-stone-700 before:to-transparent">
               {events.map((event, i) => (
-                <motion.div 
+                <motion.div
                   key={event.id}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.1 }}
                   className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active"
                 >
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full border border-slate-700 bg-slate-800 text-slate-400 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full border border-stone-700 bg-stone-800 text-stone-400 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
                     <Clock size={16} />
                   </div>
                   <div className={`w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-2xl border shadow-sm ${event.color} ${event.status === 'completed' ? 'opacity-60' : ''}`}>
@@ -104,12 +104,12 @@ export default function Timetable() {
           ) : (
             <div className="grid grid-cols-7 gap-2">
               {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                <div key={day} className="text-center text-sm font-medium text-slate-500 py-2">{day}</div>
+                <div key={day} className="text-center text-sm font-medium text-stone-500 py-2">{day}</div>
               ))}
               {Array.from({ length: 31 }).map((_, i) => (
-                <div key={i} className={`aspect-square rounded-xl border border-slate-800 flex flex-col items-center justify-center text-sm relative ${i === 23 ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/50 font-bold' : 'text-slate-300 hover:bg-slate-800 cursor-pointer transition-colors'}`}>
+                <div key={i} className={`aspect-square rounded-xl border border-stone-800 flex flex-col items-center justify-center text-sm relative ${i === 23 ? 'bg-amber-500/20 text-amber-400 border-amber-500/50 font-bold' : 'text-stone-300 hover:bg-stone-800 cursor-pointer transition-colors'}`}>
                   <span>{i + 1}</span>
-                  {i === 23 && <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 mt-1"></div>}
+                  {i === 23 && <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1"></div>}
                   {i === 24 && <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-1"></div>}
                   {i === 26 && <div className="w-1.5 h-1.5 rounded-full bg-fuchsia-400 mt-1"></div>}
                 </div>
@@ -119,34 +119,34 @@ export default function Timetable() {
         </div>
 
         {/* AI Targets */}
-        <div className="bg-slate-900 rounded-3xl p-6 shadow-lg border border-slate-800 h-fit">
+        <div className="bg-stone-900 rounded-3xl p-6 shadow-lg border border-stone-800 h-fit">
           <div className="flex items-center gap-2 mb-6 text-fuchsia-400">
             <Sparkles size={24} />
             <h2 className="text-xl font-bold text-white">AI Study Plan</h2>
           </div>
-          
+
           <div className="bg-fuchsia-500/10 rounded-2xl p-5 mb-6 border border-fuchsia-500/20">
             <h3 className="font-bold text-fuchsia-400 mb-2">Goal: Learn Python</h3>
-            <p className="text-sm text-slate-300 mb-4">You requested a 7-day plan to learn Python basics. Here are your tasks for today.</p>
-            <div className="w-full bg-slate-800 rounded-full h-2 mb-2 overflow-hidden">
+            <p className="text-sm text-stone-300 mb-4">You requested a 7-day plan to learn Python basics. Here are your tasks for today.</p>
+            <div className="w-full bg-stone-800 rounded-full h-2 mb-2 overflow-hidden">
               <div className="bg-gradient-to-r from-fuchsia-500 to-purple-600 h-2 rounded-full" style={{ width: '33%' }}></div>
             </div>
             <div className="text-xs text-fuchsia-400 font-medium text-right">Day 1 of 7 (33%)</div>
           </div>
 
           <div className="space-y-3">
-            <div className="p-4 rounded-xl border border-slate-700 bg-slate-800/50 flex items-start gap-3">
+            <div className="p-4 rounded-xl border border-stone-700 bg-stone-800/50 flex items-start gap-3">
               <CheckCircle2 size={20} className="text-emerald-500 shrink-0 mt-0.5" />
               <div>
-                <h4 className="font-semibold text-slate-300 text-sm line-through">Read Chapter 1: Variables</h4>
-                <p className="text-xs text-slate-500 mt-1">Completed at 11:30 AM</p>
+                <h4 className="font-semibold text-stone-300 text-sm line-through">Read Chapter 1: Variables</h4>
+                <p className="text-xs text-stone-500 mt-1">Completed at 11:30 AM</p>
               </div>
             </div>
             <div className="p-4 rounded-xl border border-fuchsia-500/30 bg-fuchsia-500/10 flex items-start gap-3">
               <Circle size={20} className="text-fuchsia-400 shrink-0 mt-0.5" />
               <div>
                 <h4 className="font-semibold text-white text-sm">Complete Exercise 1</h4>
-                <p className="text-xs text-slate-400 mt-1">Write a script to calculate area.</p>
+                <p className="text-xs text-stone-400 mt-1">Write a script to calculate area.</p>
                 <button className="mt-3 text-xs font-bold bg-gradient-to-r from-fuchsia-500 to-purple-600 text-white px-4 py-2 rounded-lg hover:opacity-90 transition-opacity shadow-lg shadow-fuchsia-500/20">Start Exercise</button>
               </div>
             </div>
