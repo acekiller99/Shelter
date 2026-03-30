@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { Newspaper, ExternalLink, Clock, ArrowRight } from 'lucide-react';
+import { Newspaper, Clock, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const MOCK_NEWS = [
   {
@@ -90,6 +91,7 @@ export default function News() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-12 relative rounded-3xl overflow-hidden border border-stone-800 group cursor-pointer"
         >
+          <Link href={`/news/${MOCK_NEWS[0].id}`} className="block">
           <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-stone-900/60 to-transparent z-10" />
           <div className="relative h-[400px] w-full">
             <Image
@@ -117,9 +119,10 @@ export default function News() {
               {MOCK_NEWS[0].summary}
             </p>
             <div className="flex items-center gap-2 text-amber-400 font-medium group-hover:gap-3 transition-all">
-              Read Full Article <ExternalLink size={16} />
+              Read Full Article <ArrowRight size={16} />
             </div>
           </div>
+          </Link>
         </motion.div>
       )}
 
@@ -134,6 +137,7 @@ export default function News() {
               transition={{ delay: i * 0.1 }}
               className="bg-stone-900 rounded-3xl overflow-hidden border border-stone-800 group hover:border-amber-500/50 hover:shadow-[0_0_30px_rgba(245,158,11,0.1)] transition-all flex flex-col cursor-pointer"
             >
+              <Link href={`/news/${news.id}`} className="flex flex-col flex-1">
               <div className="relative h-48 w-full overflow-hidden shrink-0">
                 <Image
                   src={news.image}
@@ -167,6 +171,7 @@ export default function News() {
                   Read More <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
+              </Link>
             </motion.div>
           )
         ))}

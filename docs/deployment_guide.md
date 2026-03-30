@@ -6,15 +6,57 @@
 # 1. Install dependencies
 npm install
 
-# 2. Create .env.local with your API key
-cp .env.example .env.local
-# Edit .env.local and set GEMINI_API_KEY
-
-# 3. Start dev server
+# 2. Start dev server
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) to view the app.
+
+> **Note:** No `.env` file is required to run the app. The Gemini API key is
+> entered at runtime via **Settings → Integrations** and saved to localStorage.
+
+---
+
+## Run Automated Tests
+
+The test suite uses [Playwright](https://playwright.dev/) for E2E testing.
+The dev server must be running on port 3000 before you start the tests.
+
+```bash
+# Terminal 1 — start the dev server
+npm run dev
+
+# Terminal 2 — run all tests
+npx playwright test
+
+# Run with visible output (list format, no HTML report)
+npx playwright test --reporter=list
+
+# Run a single spec file
+npx playwright test e2e/chat.spec.ts
+
+# First-time only: install the Chromium browser if not already present
+npx playwright install chromium
+```
+
+The test results are saved to `playwright-report/index.html`. Open it with:
+
+```bash
+npx playwright show-report
+```
+
+### What's tested
+
+| Spec file | Tests | Covers |
+|-----------|-------|--------|
+| `auth.spec.ts` | 9 | Login/signup forms, validation, OAuth button |
+| `chat.spec.ts` | 11 | Send messages, AI tab, disabled state |
+| `feed.spec.ts` | 7 | Posts, likes, search, comments |
+| `navigation.spec.ts` | 3 | Sidebar links, active highlight, page titles |
+| `settings.spec.ts` | 11 | Tabs, theme, privacy, notifications, API key |
+| `timetable.spec.ts` | 11 | CRUD events, navigation, month view |
+| `tools.spec.ts` | 8 | Search, filter, sort, add/delete, upvote |
+| **Total** | **60** | |
 
 ---
 

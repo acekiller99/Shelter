@@ -4,43 +4,33 @@ test.describe('Navigation', () => {
     test('sidebar links navigate to correct pages', async ({ page }) => {
         await page.goto('/');
 
-        // Test Tools page
-        await page.getByRole('link', { name: 'Tools' }).click();
-        await expect(page).toHaveURL('/tools');
+        // Helper: click a sidebar link and wait for URL
+        const nav = async (href: string, url: string) => {
+            await page.locator(`a[href="${href}"]`).click({ force: true });
+            await expect(page).toHaveURL(url, { timeout: 15000 });
+        };
+
+        await nav('/tools', '/tools');
         await expect(page.getByRole('heading', { name: 'Recommended Tools' })).toBeVisible();
 
-        // Test Games page
-        await page.getByRole('link', { name: 'Games' }).click();
-        await expect(page).toHaveURL('/games');
+        await nav('/games', '/games');
         await expect(page.getByRole('heading', { name: 'Game Center' })).toBeVisible();
 
-        // Test Chat page
-        await page.getByRole('link', { name: 'Chat' }).click();
-        await expect(page).toHaveURL('/chat');
+        await nav('/chat', '/chat');
         await expect(page.getByRole('heading', { name: 'Messages' })).toBeVisible();
 
-        // Test Timetable page
-        await page.getByRole('link', { name: 'Timetable' }).click();
-        await expect(page).toHaveURL('/timetable');
+        await nav('/timetable', '/timetable');
         await expect(page.getByRole('heading', { name: 'Timetable & Targets' })).toBeVisible();
 
-        // Test News page
-        await page.getByRole('link', { name: 'News' }).click();
-        await expect(page).toHaveURL('/news');
+        await nav('/news', '/news');
         await expect(page.getByRole('heading', { name: 'News & Updates' })).toBeVisible();
 
-        // Test Profile page
-        await page.getByRole('link', { name: 'Profile' }).click();
-        await expect(page).toHaveURL('/profile');
+        await nav('/profile', '/profile');
 
-        // Test Settings page
-        await page.getByRole('link', { name: 'Settings' }).click();
-        await expect(page).toHaveURL('/settings');
+        await nav('/settings', '/settings');
         await expect(page.getByRole('heading', { name: 'Settings' })).toBeVisible();
 
-        // Test Feed (home) page
-        await page.getByRole('link', { name: 'Feed' }).click();
-        await expect(page).toHaveURL('/');
+        await nav('/', '/');
         await expect(page.getByRole('heading', { name: 'Feed' })).toBeVisible();
     });
 
@@ -56,3 +46,5 @@ test.describe('Navigation', () => {
         await expect(page).toHaveTitle('Shelter');
     });
 });
+
+

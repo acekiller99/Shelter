@@ -6,9 +6,9 @@
 - [x] Auth page skeleton with Sign In / Sign Up toggle
 - [x] Form validation (email format, password strength, required fields)
 - [x] "Remember me" checkbox & forgot password flow
-- [ ] OAuth buttons (GitHub) — wired to NextAuth.js
-- [ ] Session context (logged-in user state across app)
-- [ ] Protected route middleware (redirect unauthenticated users)
+- [x] OAuth buttons (GitHub) — wired to NextAuth.js
+- [x] Session context (logged-in user state across app)
+- [x] Protected route middleware (redirect unauthenticated users)
 - [ ] Auth API routes (`/api/auth/...`)
 
 ### 1.2 Layout & Navigation
@@ -17,23 +17,23 @@
 - [x] FloatingChat widget (global)
 - [x] FloatingLobby PiP widget (global)
 - [x] GlobalContext for shared UI state
-- [ ] Animated page transitions between routes
+- [x] Animated page transitions between routes
 - [ ] Responsive polish (tablet breakpoints, touch gestures)
 - [x] Unified color palette (stone + amber across all pages)
 
 ### 1.3 Profile Page
 - [x] Profile page skeleton (cover photo, avatar, bio, status, gaming stats)
-- [ ] Edit profile form (name, bio, avatar upload, cover upload)
-- [ ] Follow / Unfollow button on other users' profiles
-- [ ] Followers / Following counts and list
-- [ ] Activity feed on profile (user's posts)
+- [x] Edit profile form (name, bio, avatar upload, cover upload)
+- [x] Follow / Unfollow button on other users' profiles
+- [x] Followers / Following counts and list
+- [x] Activity feed on profile (user's posts)
 
 ### 1.4 Settings Page
 - [x] Settings page skeleton (General, Appearance, Privacy, Notifications, Integrations tabs)
-- [ ] Theme switcher (dark/light/system) — functional
-- [ ] API key management (Gemini, OpenAI) — save to localStorage / DB
-- [ ] Privacy settings (profile visibility, post visibility)
-- [ ] Notification preferences (email, push, in-app)
+- [x] Theme switcher (dark/light/system) — functional
+- [x] API key management (Gemini, OpenAI) — save to localStorage / DB
+- [x] Privacy settings (profile visibility, post visibility)
+- [x] Notification preferences (email, push, in-app)
 
 ---
 
@@ -43,26 +43,26 @@
 - [x] Feed skeleton with create-post, like, comment, share buttons
 - [x] Search bar placeholder
 - [x] UserHoverCard on avatars
-- [ ] Create post with image upload
+- [x] Create post with image upload
 - [x] Like / Unlike toggle (optimistic UI)
-- [ ] Comment thread (expand/collapse)
-- [ ] Share post (copy link)
+- [x] Comment thread (expand/collapse)
+- [x] Share post (copy link)
 - [x] Search functionality (full-text search users & posts)
 - [ ] Follow system — filter feed to followed users
 - [ ] Infinite scroll / pagination
-- [ ] Post deletion (own posts only)
+- [x] Post deletion (own posts only)
 
 ### 2.2 Tools Directory
 - [x] Tools page skeleton with search, tag filter, grid cards
-- [ ] Add Tool form/modal (name, description, URL, author, tags)
-- [ ] Edit / Delete tool entries
-- [ ] Category/tag filter sidebar
-- [ ] Sort by (newest, popular, alphabetical)
-- [ ] Upvote/downvote or favorite tools
+- [x] Add Tool form/modal (name, description, URL, author, tags)
+- [x] Edit / Delete tool entries
+- [x] Category/tag filter sidebar
+- [x] Sort by (newest, popular, alphabetical)
+- [x] Upvote/downvote or favorite tools
 
 ### 2.3 News & Updates
 - [x] News page skeleton with featured article, grid layout, category filter
-- [ ] News article detail page
+- [x] News article detail page
 - [ ] Admin: Create/edit/delete news articles
 - [ ] RSS feed integration (optional)
 
@@ -74,7 +74,7 @@
 - [x] Chat page skeleton (contact list, message area, AI tab)
 - [x] FloatingChat quick-chat widget
 - [ ] Real-time messaging (Socket.io / WebSocket)
-- [ ] Chat with AI using user's API key (Gemini/OpenAI)
+- [x] Chat with AI using user's API key (Gemini/OpenAI)
 - [ ] Voice recording in chat (MediaRecorder API)
 - [ ] Message history persistence
 - [ ] Typing indicators
@@ -94,11 +94,11 @@
 
 ### 3.3 Timetable & AI Planner
 - [x] Timetable page skeleton (day/month view, events, AI study plan panel)
-- [ ] Create/edit/delete events (modal form)
-- [ ] Public vs. private event visibility toggle
-- [ ] Calendar navigation (prev/next day/week/month)
+- [x] Create/edit/delete events (modal form)
+- [x] Public vs. private event visibility toggle
+- [x] Calendar navigation (prev/next day/week/month)
 - [ ] AI-generated study plans (user API key → Gemini)
-- [ ] Task/target completion tracking
+- [x] Task/target completion tracking
 - [ ] Timetable REST/MCP API for external AI access
 - [ ] Notes & practical questions per target
 - [ ] Drag-and-drop event rescheduling
@@ -163,9 +163,9 @@
 - [x] Set up testing framework (Playwright for E2E, Jest/Vitest for unit)
 - [x] Auth flow tests (sign up, sign in, validation, password toggle)
 - [x] Feed CRUD tests (create, like, search)
-- [ ] Tools CRUD tests
-- [ ] Timetable CRUD tests
-- [ ] Chat message send/receive tests
+- [x] Tools CRUD tests
+- [x] Timetable CRUD tests
+- [x] Chat message send/receive tests
 - [x] Navigation & routing tests
 - [ ] Responsive layout tests
 - [ ] Accessibility tests (keyboard nav, screen reader)

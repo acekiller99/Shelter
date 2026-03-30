@@ -78,7 +78,7 @@ export function Sidebar() {
                   {isActive && (
                     <motion.div 
                       layoutId="activeTab"
-                      className="absolute inset-0 bg-amber-950/50 rounded-xl border border-amber-900/50"
+                      className="absolute inset-0 bg-amber-950/50 rounded-xl border border-amber-900/50 pointer-events-none"
                       initial={false}
                       transition={{ type: "spring", stiffness: 300, damping: 30 }}
                     />

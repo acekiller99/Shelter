@@ -49,11 +49,13 @@ test.describe('Feed Page', () => {
     });
 
     test('like button toggles', async ({ page }) => {
-        // Find the first like button and click it
-        const likeButtons = page.locator('button').filter({ hasText: '24' });
-        await likeButtons.first().click();
-        // After clicking, the count should change to 25
-        await expect(page.getByText('25')).toBeVisible();
+        // Find the first post's like button and get initial count
+        const firstPost = page.locator('[class*="rounded-3xl"]').filter({ hasText: 'Alex Chen' }).first();
+        const likeBtn = firstPost.locator('button').filter({ hasText: /^\d+$/ }).first();
+        const initialCount = parseInt((await likeBtn.textContent() || '0').trim());
+        await likeBtn.click();
+        // After clicking, count should increment by 1
+        await expect(likeBtn).toContainText(String(initialCount + 1));
     });
 
     test('post button is disabled when textarea is empty', async ({ page }) => {
