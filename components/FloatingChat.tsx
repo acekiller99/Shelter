@@ -1,24 +1,34 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MessageSquare, X, Send, Minus } from 'lucide-react';
 import { useGlobal } from './GlobalContext';
 import Image from 'next/image';
 
 export function FloatingChat() {
-  const { isChatOpen, setIsChatOpen } = useGlobal();
+  const { isChatOpen, setIsChatOpen, chatUnreadCount, clearChatUnread, incrementChatUnread } = useGlobal();
   const [isMinimized, setIsMinimized] = useState(false);
+  const isMinimizedRef = useRef(false);
+  isMinimizedRef.current = isMinimized;
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState([
     { id: 1, text: 'Hey! Ready for the raid later?', sender: 'Alex', isMe: false },
     { id: 2, text: 'Yeah, just finishing up some work.', sender: 'Me', isMe: true },
   ]);
 
+  const AUTO_REPLIES = ['Sounds good!', 'Nice!', "I'll be there!", 'Let me know when you\'re ready.', '👍 Cool!'];
+
   const handleSend = () => {
     if (!input.trim()) return;
-    setMessages([...messages, { id: Date.now(), text: input, sender: 'Me', isMe: true }]);
+    const userText = input;
+    setMessages(prev => [...prev, { id: Date.now(), text: userText, sender: 'Me', isMe: true }]);
     setInput('');
+    setTimeout(() => {
+      const reply = AUTO_REPLIES[Math.floor(Math.random() * AUTO_REPLIES.length)];
+      setMessages(prev => [...prev, { id: Date.now() + 1, text: reply, sender: 'Alex', isMe: false }]);
+      if (isMinimizedRef.current) incrementChatUnread();
+    }, 1500);
   };
 
   return (
@@ -32,7 +42,7 @@ export function FloatingChat() {
             className="w-80 bg-stone-900 border border-stone-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col"
           >
             {/* Header */}
-            <div className="h-14 bg-stone-800 border-b border-stone-700 flex items-center justify-between px-4 shrink-0 cursor-pointer" onClick={() => setIsMinimized(!isMinimized)}>
+            <div className="h-14 bg-stone-800 border-b border-stone-700 flex items-center justify-between px-4 shrink-0 cursor-pointer" onClick={() => { setIsMinimized(!isMinimized); if (isMinimized) clearChatUnread(); }}>
               <div className="flex items-center gap-2">
                 <div className="relative">
                   <Image src="https://picsum.photos/seed/alex/100/100" alt="Alex" width={32} height={32} className="rounded-full" referrerPolicy="no-referrer" />
@@ -41,7 +51,7 @@ export function FloatingChat() {
                 <span className="font-bold text-white text-sm">Alex Chen</span>
               </div>
               <div className="flex items-center gap-1">
-                <button className="p-1.5 text-stone-400 hover:text-white hover:bg-stone-700 rounded-lg transition-colors" onClick={(e) => { e.stopPropagation(); setIsMinimized(!isMinimized); }}>
+                <button className="p-1.5 text-stone-400 hover:text-white hover:bg-stone-700 rounded-lg transition-colors" onClick={(e) => { e.stopPropagation(); setIsMinimized(!isMinimized); if (isMinimized) clearChatUnread(); }}>
                   <Minus size={16} />
                 </button>
                 <button className="p-1.5 text-stone-400 hover:text-white hover:bg-stone-700 rounded-lg transition-colors" onClick={(e) => { e.stopPropagation(); setIsChatOpen(false); }}>
@@ -87,13 +97,15 @@ export function FloatingChat() {
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => setIsChatOpen(true)}
+          onClick={() => { setIsChatOpen(true); clearChatUnread(); }}
           className="w-14 h-14 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full shadow-lg shadow-amber-500/30 flex items-center justify-center text-white relative group"
         >
           <MessageSquare size={24} />
-          <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-stone-900 flex items-center justify-center text-[10px] font-bold">
-            2
-          </div>
+          {chatUnreadCount > 0 && (
+            <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-stone-900 flex items-center justify-center text-[10px] font-bold">
+              {chatUnreadCount > 9 ? '9+' : chatUnreadCount}
+            </div>
+          )}
         </motion.button>
       )}
     </div>

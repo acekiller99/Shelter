@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, Image as ImageIcon, Send, Heart, MessageCircle, Share2, MoreHorizontal, SearchX, Trash2, X, ChevronDown, ChevronUp, Check } from 'lucide-react';
+import { Search, Image as ImageIcon, Send, Heart, MessageCircle, Share2, MoreHorizontal, SearchX, Trash2, X, ChevronDown, ChevronUp, Check, Users } from 'lucide-react';
 import Image from 'next/image';
 import { UserHoverCard } from '@/components/UserHoverCard';
 import { useGlobal } from '@/components/GlobalContext';
@@ -60,18 +60,46 @@ const INITIAL_POSTS: Post[] = [
   }
 ];
 
+const PAGE_SIZE = 5;
+
 export default function Feed() {
-  const { currentUser } = useGlobal();
+  const { currentUser, followedUsers } = useGlobal();
   const [posts, setPosts] = useState<Post[]>(INITIAL_POSTS);
   const [newPost, setNewPost] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showFollowing, setShowFollowing] = useState(false);
+  const [displayCount, setDisplayCount] = useState(PAGE_SIZE);
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const isLoadingMore = useRef(false);
   const [likedPosts, setLikedPosts] = useState<Set<number>>(new Set());
   const [expandedComments, setExpandedComments] = useState<Set<number>>(new Set());
   const [commentInputs, setCommentInputs] = useState<Record<number, string>>({});
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [copiedId, setCopiedId] = useState<number | null>(null);
   const [postImage, setPostImage] = useState<string | null>(null);
-  const imageInputRef = useRef<HTMLInputElement>(null);
+
+  const loadMore = useCallback(() => {
+    if (isLoadingMore.current) return;
+    isLoadingMore.current = true;
+    setTimeout(() => {
+      setDisplayCount(prev => prev + PAGE_SIZE);
+      isLoadingMore.current = false;
+    }, 400);
+  }, []);
+
+  useEffect(() => {
+    const el = bottomRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) loadMore();
+    }, { threshold: 0.1 });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [loadMore]);
+
+  // Reset pagination when filter/search changes
+  useEffect(() => { setDisplayCount(PAGE_SIZE); }, [searchQuery, showFollowing]);
 
   const handlePost = () => {
     if (!newPost.trim() && !postImage) return;
@@ -150,22 +178,41 @@ export default function Feed() {
     setOpenMenuId(null);
   };
 
-  const filteredPosts = useMemo(() => {
-    if (!searchQuery.trim()) return posts;
+  const allFilteredPosts = useMemo(() => {
+    let result = posts;
+    if (showFollowing) {
+      result = result.filter(p => p.isOwn || followedUsers.has(p.author.handle));
+    }
+    if (!searchQuery.trim()) return result;
     const q = searchQuery.toLowerCase();
-    return posts.filter(p =>
+    return result.filter(p =>
       p.content.toLowerCase().includes(q) ||
       p.author.name.toLowerCase().includes(q) ||
       p.author.handle.toLowerCase().includes(q)
     );
-  }, [posts, searchQuery]);
+  }, [posts, searchQuery, showFollowing, followedUsers]);
+
+  const filteredPosts = allFilteredPosts.slice(0, displayCount);
+  const hasMore = displayCount < allFilteredPosts.length;
 
   return (
     <div className="max-w-3xl mx-auto p-4 md:p-8">
       {/* Header & Search */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <h1 className="text-3xl font-bold tracking-tight text-white" style={{ fontFamily: 'var(--font-display)' }}>Feed</h1>
-        <div className="relative w-full md:w-72">
+        <div className="flex items-center gap-3 flex-wrap">
+          <button
+            onClick={() => setShowFollowing(!showFollowing)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all border ${
+              showFollowing
+                ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+                : 'text-stone-400 border-stone-700 hover:text-stone-200 hover:border-stone-500'
+            }`}
+          >
+            <Users size={16} />
+            Following
+          </button>
+          <div className="relative w-full md:w-72">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500" size={18} />
           <input
             type="text"
@@ -177,6 +224,7 @@ export default function Feed() {
           {searchQuery && (
             <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-500 hover:text-stone-300 transition-colors">✕</button>
           )}
+          </div>
         </div>
       </div>
 
@@ -236,13 +284,20 @@ export default function Feed() {
               className="flex flex-col items-center justify-center py-16 text-center"
             >
               <div className="w-16 h-16 bg-stone-800 rounded-full flex items-center justify-center text-stone-500 mb-4">
-                <SearchX size={32} />
+                {showFollowing && !searchQuery ? <Users size={32} /> : <SearchX size={32} />}
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">No results found</h3>
-              <p className="text-stone-400 max-w-sm">No posts match &quot;{searchQuery}&quot;. Try a different search term.</p>
+              <h3 className="text-xl font-bold text-white mb-2">
+                {showFollowing && !searchQuery ? 'No followed users yet' : 'No results found'}
+              </h3>
+              <p className="text-stone-400 max-w-sm">
+                {showFollowing && !searchQuery
+                  ? 'Hover over a user\'s avatar and click Follow to see their posts here.'
+                  : `No posts match "${searchQuery}". Try a different search term.`}
+              </p>
             </motion.div>
           ) : (
-            filteredPosts.map((post, i) => (
+            <>
+            {filteredPosts.map((post, i) => (
               <motion.div
                 key={post.id}
                 layout
@@ -250,7 +305,7 @@ export default function Feed() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20, scale: 0.95 }}
                 transition={{ delay: i * 0.05 }}
-                className="bg-stone-900 rounded-3xl p-6 shadow-lg border border-stone-800"
+                className="bg-stone-900 rounded-3xl p-4 md:p-6 shadow-lg border border-stone-800"
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
@@ -312,6 +367,8 @@ export default function Feed() {
                 <div className="flex items-center gap-6 pt-4 border-t border-stone-800/50 text-stone-400">
                   <button
                     onClick={() => toggleLike(post.id)}
+                    aria-label={likedPosts.has(post.id) ? `Unlike post by ${post.author.name}` : `Like post by ${post.author.name}`}
+                    aria-pressed={likedPosts.has(post.id)}
                     className={`flex items-center gap-2 transition-colors group ${likedPosts.has(post.id) ? 'text-red-400' : 'hover:text-red-400'}`}
                   >
                     <div className={`p-2 rounded-full transition-colors ${likedPosts.has(post.id) ? 'bg-red-500/10' : 'group-hover:bg-red-500/10'}`}>
@@ -321,6 +378,8 @@ export default function Feed() {
                   </button>
                   <button
                     onClick={() => toggleComments(post.id)}
+                    aria-label={expandedComments.has(post.id) ? 'Hide comments' : 'Show comments'}
+                    aria-expanded={expandedComments.has(post.id)}
                     className={`flex items-center gap-2 transition-colors group ${expandedComments.has(post.id) ? 'text-amber-400' : 'hover:text-amber-400'}`}
                   >
                     <div className="p-2 rounded-full group-hover:bg-amber-500/10 transition-colors">
@@ -331,6 +390,7 @@ export default function Feed() {
                   </button>
                   <button
                     onClick={() => sharePost(post.id)}
+                    aria-label="Share post"
                     className="flex items-center gap-2 hover:text-emerald-400 transition-colors group ml-auto"
                   >
                     <div className="p-2 rounded-full group-hover:bg-emerald-500/10 transition-colors">
@@ -386,7 +446,21 @@ export default function Feed() {
                   )}
                 </AnimatePresence>
               </motion.div>
-            ))
+            ))}
+            {/* Infinite scroll sentinel */}
+            <div ref={bottomRef} className="py-2 flex justify-center" aria-live="polite" aria-atomic="true">
+              {hasMore && (
+                <div className="flex items-center gap-2 text-stone-500 text-sm" role="status" aria-label="Loading more posts">
+                  <div className="w-1.5 h-1.5 rounded-full bg-stone-500 animate-bounce [animation-delay:-0.3s]" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-stone-500 animate-bounce [animation-delay:-0.15s]" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-stone-500 animate-bounce" />
+                </div>
+              )}
+              {!hasMore && allFilteredPosts.length > PAGE_SIZE && (
+                <p className="text-stone-600 text-xs">You&apos;re all caught up</p>
+              )}
+            </div>
+            </>
           )}
         </AnimatePresence>
       </div>

@@ -1,0 +1,367 @@
+// Shelter — Prisma Schema
+// PostgreSQL datasource. Set DATABASE_URL in .env before running migrations.
+// Run: npx prisma migrate dev --name init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────
+// Enums
+// ─────────────────────────────────────────────
+
+enum UserStatus {
+  ONLINE
+  AWAY
+  OFFLINE
+}
+
+enum Visibility {
+  PUBLIC
+  PRIVATE
+}
+
+enum EventType {
+  STUDY
+  EXAM
+  ASSIGNMENT
+  SOCIAL
+  OTHER
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  FILE
+  VOICE
+  SYSTEM
+}
+
+enum NotificationType {
+  LIKE
+  COMMENT
+  FOLLOW
+  MENTION
+  SYSTEM
+}
+
+enum GameType {
+  POKER
+  DUNGEON_CRAWLER
+}
+
+enum GameStatus {
+  WAITING
+  PLAYING
+  FINISHED
+}
+
+// ─────────────────────────────────────────────
+// Auth (NextAuth v5 / Auth.js tables)
+// ─────────────────────────────────────────────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─────────────────────────────────────────────
+// User
+// ─────────────────────────────────────────────
+
+model User {
+  id            String     @id @default(cuid())
+  name          String
+  username      String     @unique
+  email         String     @unique
+  emailVerified DateTime?
+  password      String?    // hashed — null for OAuth-only accounts
+  image         String?    // avatar URL
+  coverImage    String?
+  bio           String     @default("")
+  location      String     @default("")
+  website       String     @default("")
+  status        UserStatus @default(OFFLINE)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  // NextAuth relations
+  accounts Account[]
+  sessions Session[]
+
+  // Social
+  posts    Post[]
+  comments Comment[]
+  likes    Like[]
+
+  // Follow system (self-referential many-to-many via explicit join table)
+  followers Follow[] @relation("Following") // people who follow this user
+  following Follow[] @relation("Follower")  // people this user follows
+
+  // Tools
+  tools         Tool[]
+  toolUpvotes   ToolUpvote[]
+  toolFavorites ToolFavorite[]
+
+  // Timetable
+  events Event[]
+
+  // Chat
+  chatMessages ChatMessage[]
+  chatMembers  ChatMember[]
+
+  // Notifications
+  notifications Notification[]
+
+  // Games
+  gameParticipants GameParticipant[]
+}
+
+// ─────────────────────────────────────────────
+// Follow (many-to-many self-referential)
+// ─────────────────────────────────────────────
+
+model Follow {
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+
+  follower  User @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@id([followerId, followingId])
+}
+
+// ─────────────────────────────────────────────
+// Social Feed
+// ─────────────────────────────────────────────
+
+model Post {
+  id         String     @id @default(cuid())
+  content    String
+  image      String?
+  visibility Visibility @default(PUBLIC)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  comments Comment[]
+  likes    Like[]
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  text      String
+  createdAt DateTime @default(now())
+
+  postId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+}
+
+model Like {
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@id([userId, postId])
+}
+
+// ─────────────────────────────────────────────
+// Tools Directory
+// ─────────────────────────────────────────────
+
+model Tool {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  url         String
+  authorLabel String   // display name (e.g. "Microsoft") — not necessarily the submitter
+  tags        String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  authorId String
+  user     User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  upvotes   ToolUpvote[]
+  favorites ToolFavorite[]
+}
+
+model ToolUpvote {
+  userId    String
+  toolId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tool Tool @relation(fields: [toolId], references: [id], onDelete: Cascade)
+
+  @@id([userId, toolId])
+}
+
+model ToolFavorite {
+  userId    String
+  toolId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tool Tool @relation(fields: [toolId], references: [id], onDelete: Cascade)
+
+  @@id([userId, toolId])
+}
+
+// ─────────────────────────────────────────────
+// Timetable / Events
+// ─────────────────────────────────────────────
+
+model Event {
+  id          String     @id @default(cuid())
+  title       String
+  date        String     // YYYY-MM-DD (kept as string for easy querying without timezone issues)
+  time        String     // HH:MM
+  duration    Int        // minutes
+  description String     @default("")
+  type        EventType  @default(OTHER)
+  visibility  Visibility @default(PUBLIC)
+  completed   Boolean    @default(false)
+  notes       String     @default("")
+  color       String     @default("#6366f1")
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+}
+
+// ─────────────────────────────────────────────
+// Chat
+// ─────────────────────────────────────────────
+
+model ChatRoom {
+  id        String   @id @default(cuid())
+  name      String?  // null for direct messages
+  isDirect  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  members  ChatMember[]
+  messages ChatMessage[]
+}
+
+model ChatMember {
+  userId   String
+  roomId   String
+  joinedAt DateTime  @default(now())
+  lastRead DateTime?
+
+  user User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  room ChatRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roomId])
+}
+
+model ChatMessage {
+  id        String      @id @default(cuid())
+  content   String
+  type      MessageType @default(TEXT)
+  fileUrl   String?
+  createdAt DateTime    @default(now())
+  editedAt  DateTime?
+
+  roomId String
+  room   ChatRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+}
+
+// ─────────────────────────────────────────────
+// Notifications
+// ─────────────────────────────────────────────
+
+model Notification {
+  id        String           @id @default(cuid())
+  type      NotificationType
+  content   String
+  read      Boolean          @default(false)
+  link      String?
+  createdAt DateTime         @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─────────────────────────────────────────────
+// Games
+// ─────────────────────────────────────────────
+
+model GameRoom {
+  id         String     @id @default(cuid())
+  type       GameType
+  status     GameStatus @default(WAITING)
+  maxPlayers Int        @default(6)
+  config     Json?      // game-specific settings (blinds, difficulty, etc.)
+  state      Json?      // current game state snapshot (cards, health, etc.)
+  createdAt  DateTime   @default(now())
+  finishedAt DateTime?
+
+  participants GameParticipant[]
+}
+
+model GameParticipant {
+  id       String   @id @default(cuid())
+  userId   String
+  roomId   String
+  seat     Int?     // seat number at the poker table
+  chips    Int      @default(1000)
+  score    Int      @default(0) // for RPG: XP or dungeon score
+  isReady  Boolean  @default(false)
+  joinedAt DateTime @default(now())
+
+  user User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  room GameRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roomId])
+}

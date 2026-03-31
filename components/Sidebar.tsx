@@ -20,6 +20,7 @@ import {
   Settings
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useGlobal } from './GlobalContext';
 
 const navItems = [
   { name: 'Feed', href: '/', icon: Home },
@@ -35,16 +36,28 @@ const navItems = [
 export function Sidebar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const { chatUnreadCount } = useGlobal();
 
   return (
     <>
       {/* Mobile toggle */}
       <button 
-        className="md:hidden fixed top-4 left-4 z-50 p-2 bg-stone-800 text-white rounded-full shadow-md border border-stone-700"
+        className="md:hidden fixed top-3 right-4 z-50 p-2 bg-stone-800 text-white rounded-full shadow-md border border-stone-700"
         onClick={() => setIsOpen(!isOpen)}
+        aria-label={isOpen ? 'Close navigation menu' : 'Open navigation menu'}
+        aria-expanded={isOpen}
+        aria-controls="main-sidebar"
       >
         {isOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
+
+      {/* Mobile backdrop */}
+      {isOpen && (
+        <div
+          className="md:hidden fixed inset-0 z-30 bg-black/50 backdrop-blur-sm"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
 
       {/* Sidebar */}
       <motion.div 
@@ -52,6 +65,8 @@ export function Sidebar() {
           "fixed inset-y-0 left-0 z-40 w-64 bg-[#0c0a09]/95 backdrop-blur-xl border-r border-stone-800 shadow-2xl flex flex-col transition-transform duration-300 ease-in-out md:translate-x-0",
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
+        id="main-sidebar"
+        aria-label="Main navigation"
       >
         <div className="p-6 flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white font-bold text-xl shadow-[0_0_15px_rgba(245,158,11,0.5)]">
@@ -62,7 +77,7 @@ export function Sidebar() {
           </span>
         </div>
 
-        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto no-scrollbar">
+        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto no-scrollbar" aria-label="Site pages">
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             return (
@@ -85,6 +100,11 @@ export function Sidebar() {
                   )}
                   <item.icon size={20} className="relative z-10" />
                   <span className="relative z-10">{item.name}</span>
+                  {item.name === 'Chat' && chatUnreadCount > 0 && (
+                    <span className="ml-auto bg-red-500 text-white text-[10px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-0.5 relative z-20">
+                      {chatUnreadCount > 9 ? '9+' : chatUnreadCount}
+                    </span>
+                  )}
                 </motion.div>
               </Link>
             );

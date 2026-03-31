@@ -70,6 +70,9 @@ interface GlobalContextType {
   updateSettings: (updates: Partial<AppSettings>) => void;
   followedUsers: Set<string>;
   toggleFollow: (userId: string) => void;
+  chatUnreadCount: number;
+  clearChatUnread: () => void;
+  incrementChatUnread: () => void;
 }
 
 const GlobalContext = createContext<GlobalContextType | undefined>(undefined);
@@ -98,6 +101,7 @@ export function GlobalProvider({ children }: { children: ReactNode }) {
   const [currentUser, setCurrentUser] = useState<UserProfile>(DEFAULT_USER);
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
   const [followedUsers, setFollowedUsers] = useState<Set<string>>(new Set());
+  const [chatUnreadCount, setChatUnreadCount] = useState(1);
 
   // Load persisted state from localStorage
   useEffect(() => {
@@ -142,6 +146,9 @@ export function GlobalProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const clearChatUnread = () => setChatUnreadCount(0);
+  const incrementChatUnread = () => setChatUnreadCount(prev => prev + 1);
+
   return (
     <GlobalContext.Provider value={{
       isChatOpen, setIsChatOpen,
@@ -149,6 +156,7 @@ export function GlobalProvider({ children }: { children: ReactNode }) {
       isLoggedIn, currentUser, updateProfile,
       settings, updateSettings,
       followedUsers, toggleFollow,
+      chatUnreadCount, clearChatUnread, incrementChatUnread,
     }}>
       {children}
     </GlobalContext.Provider>

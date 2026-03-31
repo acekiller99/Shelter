@@ -18,7 +18,7 @@
 - [x] FloatingLobby PiP widget (global)
 - [x] GlobalContext for shared UI state
 - [x] Animated page transitions between routes
-- [ ] Responsive polish (tablet breakpoints, touch gestures)
+- [x] Responsive polish (tablet breakpoints, touch gestures)
 - [x] Unified color palette (stone + amber across all pages)
 
 ### 1.3 Profile Page
@@ -48,8 +48,8 @@
 - [x] Comment thread (expand/collapse)
 - [x] Share post (copy link)
 - [x] Search functionality (full-text search users & posts)
-- [ ] Follow system — filter feed to followed users
-- [ ] Infinite scroll / pagination
+- [x] Follow system — filter feed to followed users
+- [x] Infinite scroll / pagination
 - [x] Post deletion (own posts only)
 
 ### 2.2 Tools Directory
@@ -63,7 +63,7 @@
 ### 2.3 News & Updates
 - [x] News page skeleton with featured article, grid layout, category filter
 - [x] News article detail page
-- [ ] Admin: Create/edit/delete news articles
+- [x] Admin: Create/edit/delete news articles
 - [ ] RSS feed integration (optional)
 
 ---
@@ -75,33 +75,33 @@
 - [x] FloatingChat quick-chat widget
 - [ ] Real-time messaging (Socket.io / WebSocket)
 - [x] Chat with AI using user's API key (Gemini/OpenAI)
-- [ ] Voice recording in chat (MediaRecorder API)
-- [ ] Message history persistence
-- [ ] Typing indicators
-- [ ] Read receipts
-- [ ] File/image sharing in chat
-- [ ] Chat notifications (unread badge)
+- [x] Voice recording in chat (MediaRecorder API)
+- [x] Message history persistence
+- [x] Typing indicators
+- [x] Read receipts
+- [x] File/image sharing in chat
+- [x] Chat notifications (unread badge)
 
 ### 3.2 voice Lobby
 - [x] Voice lobby page skeleton (participant grid, controls, side chat)
 - [x] FloatingLobby minimized PiP
 - [ ] WebRTC voice chat (LiveKit or Jitsi integration)
-- [ ] Screen sharing (getDisplayMedia API)
-- [ ] Mute/unmute, video on/off controls — functional
-- [ ] Room creation & join via invite link
-- [ ] Participant presence indicators
-- [ ] Push-to-talk option
+- [x] Screen sharing (getDisplayMedia API)
+- [x] Mute/unmute, video on/off controls — functional
+- [x] Room creation & join via invite link
+- [x] Participant presence indicators
+- [x] Push-to-talk option
 
 ### 3.3 Timetable & AI Planner
 - [x] Timetable page skeleton (day/month view, events, AI study plan panel)
 - [x] Create/edit/delete events (modal form)
 - [x] Public vs. private event visibility toggle
 - [x] Calendar navigation (prev/next day/week/month)
-- [ ] AI-generated study plans (user API key → Gemini)
+- [x] AI-generated study plans (user API key → Gemini)
 - [x] Task/target completion tracking
-- [ ] Timetable REST/MCP API for external AI access
-- [ ] Notes & practical questions per target
-- [ ] Drag-and-drop event rescheduling
+- [x] Timetable REST/MCP API for external AI access (`/api/timetable` — public GET endpoint)
+- [x] Notes & practical questions per target
+- [x] Drag-and-drop event rescheduling
 
 ---
 
@@ -110,47 +110,49 @@
 ### 4.1 Game Center
 - [x] Games listing page skeleton (Poker, RPG cards)
 - [x] Game room skeleton (player avatars, chat, controls)
-- [ ] Poker game — full playable implementation (Phaser.js or React-based)
-  - [ ] Game logic (Texas Hold'em rules)
-  - [ ] Card rendering & animations
+- [x] Poker game — full playable implementation (Phaser.js or React-based)
+  - [x] Game logic (Texas Hold'em rules)
+  - [x] Card rendering & animations
   - [ ] Multiplayer state sync (Colyseus or WebSocket)
-  - [ ] Betting UI (call, raise, fold, all-in)
+  - [x] Betting UI (call, raise, fold, all-in)
   - [ ] Game lobby matchmaking
-- [ ] Dungeon Crawler RPG (Phase 4+, after Poker validated)
-  - [ ] Character creation
-  - [ ] Dungeon generation
-  - [ ] Combat system
-  - [ ] Item/equipment drops
+- [x] Dungeon Crawler RPG (Phase 4+, after Poker validated)
+  - [x] Character creation
+  - [x] Dungeon generation
+  - [x] Combat system
+  - [x] Item/equipment drops
   - [ ] Party system (co-op)
-- [ ] Leaderboards
+- [x] Leaderboards
 
 ---
 
 ## Phase 5: Backend & Infrastructure
 
 ### 5.1 Database Setup
-- [ ] PostgreSQL schema design (users, posts, tools, events, chat, games)
-- [ ] Prisma ORM setup & migrations
-- [ ] Seed data for development
+- [x] PostgreSQL schema design (users, posts, tools, events, chat, games) — `prisma/schema.prisma`
+- [x] Prisma ORM setup & migrations — Prisma 5, client singleton in `lib/prisma.ts`
+- [x] Seed data for development — `prisma/seed.ts` (3 users, posts, tools, events, chat room, game room)
 
 ### 5.2 Authentication Backend
-- [ ] NextAuth.js / Auth.js configuration
-- [ ] JWT sessions
-- [ ] OAuth providers (GitHub)
-- [ ] Password hashing & credential auth
+- [x] NextAuth.js v4 configuration — `auth.ts` (authOptions, JWT strategy)
+- [x] JWT sessions
+- [x] OAuth providers (GitHub)
+- [x] Password hashing & credential auth (bcryptjs)
 
 ### 5.3 API Routes
-- [ ] `/api/posts` — CRUD for social feed
-- [ ] `/api/tools` — CRUD for tools directory
-- [ ] `/api/users` — profiles, search, follow
-- [ ] `/api/events` — timetable CRUD
-- [ ] `/api/chat` — message history
-- [ ] `/api/ai` — proxy AI calls with user API key
+- [x] `/api/posts` — CRUD for social feed (in-memory scaffold)
+- [x] `/api/tools` — CRUD for tools directory (in-memory scaffold)
+- [x] `/api/users` — profiles, search, follow (in-memory scaffold)
+- [x] `/api/events` — timetable CRUD (in-memory scaffold)
+- [x] `/api/chat` — message history (in-memory scaffold)
+- [x] `/api/ai` — proxy AI calls with user API key (Gemini server-side proxy)
 
 ### 5.4 Real-Time Infrastructure
-- [ ] Socket.io server setup (chat, presence)
+- [x] Socket.io server setup — custom `server.ts` with `/chat`, `/presence`, `/game` namespaces
+- [x] Typed event definitions — `lib/socket-events.ts`
+- [x] Browser socket client singletons — `lib/socket-client.ts`
 - [ ] WebRTC TURN server (Coturn for voice lobby)
-- [ ] Game server (Colyseus for multiplayer games)
+- [ ] Game server (Colyseus for multiplayer games — replaces current Socket.io `/game` namespace)
 
 ### 5.5 File Storage
 - [ ] MinIO or Cloudflare R2 for avatars, images, voice recordings
@@ -167,8 +169,8 @@
 - [x] Timetable CRUD tests
 - [x] Chat message send/receive tests
 - [x] Navigation & routing tests
-- [ ] Responsive layout tests
-- [ ] Accessibility tests (keyboard nav, screen reader)
+- [x] Responsive layout tests
+- [x] Accessibility tests (keyboard nav, screen reader) — `e2e/accessibility.spec.ts`
 
 ### Manual Testing
 - [ ] Cross-browser testing (Chrome, Firefox, Safari, Edge)

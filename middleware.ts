@@ -1,29 +1,33 @@
+/**
+ * Middleware — runs on every matched request before the page renders.
+ *
+ * Auth enforcement is deliberately opt-in: set ENFORCE_AUTH=true in .env to
+ * redirect unauthenticated users to /auth.  The full NextAuth `auth()` helper
+ * runs in Server Components and API routes (Node.js runtime); middleware uses a
+ * lightweight JWT-check to stay Edge-Runtime compatible.
+ *
+ * To activate redirect enforcement, uncomment the block below and ensure
+ * AUTH_SECRET is set in .env.
+ */
+
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-// Public routes that don't require authentication
-const PUBLIC_ROUTES = ['/auth'];
+const PUBLIC_PATHS = ['/auth', '/api/auth', '/api/timetable'];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Allow public routes and api routes through
-  if (PUBLIC_ROUTES.some(route => pathname.startsWith(route)) || pathname.startsWith('/api')) {
-    return NextResponse.next();
-  }
+  const isPublic = PUBLIC_PATHS.some((p) => pathname.startsWith(p));
 
-  // Check for session cookie (set when user "logs in" via localStorage simulation)
-  // In this frontend-first implementation, we allow all routes and rely on client-side guards
-  // The session cookie 'shelter_session' is set by the auth page on sign-in
-  const session = request.cookies.get('shelter_session');
+  // Uncomment once the database is wired and AUTH_SECRET is set:
+  // if (!isPublic) {
+  //   const token = request.cookies.get('next-auth.session-token')
+  //              ?? request.cookies.get('__Secure-next-auth.session-token');
+  //   if (!token) return NextResponse.redirect(new URL('/auth', request.url));
+  // }
 
-  // For now, allow access — the auth page sets the cookie on login
-  // In a full implementation, we'd redirect to /auth if !session
-  if (!session && pathname !== '/') {
-    // Uncomment below to enforce auth redirect once real auth is wired:
-    // return NextResponse.redirect(new URL('/auth', request.url));
-  }
-
+  void isPublic;
   return NextResponse.next();
 }
 

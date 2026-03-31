@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Calendar as CalendarIcon, Clock, Plus, Sparkles, CheckCircle2, Circle, ChevronLeft, ChevronRight, Lock, Globe, X, Check, Pencil, Trash2 } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, Plus, Sparkles, CheckCircle2, Circle, ChevronLeft, ChevronRight, Lock, Globe, X, Check, Pencil, Trash2, Loader2, GripVertical } from 'lucide-react';
+import { useGlobal } from '@/components/GlobalContext';
 
 interface CalendarEvent {
   id: number;
@@ -41,6 +42,7 @@ const INITIAL_EVENTS: CalendarEvent[] = [
 const EMPTY_FORM = { title: '', time: '', type: 'event' as const, color: 0, notes: '', isPublic: false };
 
 export default function Timetable() {
+  const { settings } = useGlobal();
   const today = new Date();
   const [events, setEvents] = useState<CalendarEvent[]>(INITIAL_EVENTS);
   const [view, setView] = useState<'day' | 'month'>('day');
@@ -50,6 +52,10 @@ export default function Timetable() {
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [formError, setFormError] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiPlanText, setAiPlanText] = useState('');
+  const [aiError, setAiError] = useState('');
+  const [draggedId, setDraggedId] = useState<number | null>(null);
 
   const selectedDateStr = formatDate(currentDate);
   const todayEvents = events.filter(e => e.date === selectedDateStr);
@@ -82,6 +88,54 @@ export default function Timetable() {
   };
 
   const deleteEvent = (id: number) => setEvents(prev => prev.filter(e => e.id !== id));
+
+  const handleDragStart = (id: number) => setDraggedId(id);
+  const handleDragOver = (e: React.DragEvent, overId: number) => {
+    e.preventDefault();
+    if (draggedId === null || draggedId === overId) return;
+    setEvents(prev => {
+      const arr = [...prev];
+      const fromIdx = arr.findIndex(e => e.id === draggedId);
+      const toIdx = arr.findIndex(e => e.id === overId);
+      if (fromIdx === -1 || toIdx === -1) return prev;
+      const [item] = arr.splice(fromIdx, 1);
+      arr.splice(toIdx, 0, item);
+      return arr;
+    });
+  };
+  const handleDragEnd = () => setDraggedId(null);
+
+  const generateAiPlan = async () => {
+    if (!settings.geminiApiKey) {
+      setAiError('No Gemini API key set. Add one in Settings.');
+      return;
+    }
+    setAiLoading(true);
+    setAiError('');
+    setAiPlanText('');
+    const eventList = todayEvents.length > 0
+      ? todayEvents.map(e => `- ${e.title} (${e.time})`).join('\n')
+      : 'No events scheduled yet';
+    const prompt = `I have the following tasks/events for today:\n${eventList}\n\nCreate a concise, actionable study plan. Give 3-5 bullet points with specific tips for tackling these tasks efficiently today. Be brief and practical.`;
+    try {
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${settings.geminiApiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: prompt }] }] }),
+        }
+      );
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error?.message || 'API error');
+      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'No response from AI.';
+      setAiPlanText(text);
+    } catch (err: any) {
+      setAiError(err.message || 'Failed to generate plan.');
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   const handleSubmit = () => {
     if (!form.title.trim() || !form.time.trim()) { setFormError('Title and time are required.'); return; }
@@ -139,7 +193,7 @@ export default function Timetable() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Calendar View */}
         <div className="lg:col-span-2 bg-stone-900 rounded-3xl p-6 shadow-lg border border-stone-800">
           <div className="flex items-center justify-between mb-6">
@@ -171,8 +225,13 @@ export default function Timetable() {
               ) : (
                 todayEvents.map((event, i) => (
                   <motion.div key={event.id} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }}
-                    className={`flex items-center justify-between gap-3 p-4 rounded-2xl border ${event.color} ${event.status === 'completed' ? 'opacity-60' : ''}`}>
+                    draggable
+                    onDragStart={() => handleDragStart(event.id)}
+                    onDragOver={(e) => handleDragOver(e, event.id)}
+                    onDragEnd={handleDragEnd}
+                    className={`flex items-center justify-between gap-3 p-4 rounded-2xl border ${event.color} ${event.status === 'completed' ? 'opacity-60' : ''} ${draggedId === event.id ? 'opacity-40 scale-95' : ''} cursor-grab active:cursor-grabbing transition-all`}>
                     <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <GripVertical size={14} className="shrink-0 opacity-30" />
                       {event.type === 'target' ? (
                         <button onClick={() => toggleStatus(event.id)} className="hover:scale-110 transition-transform shrink-0">
                           {event.status === 'completed' ? <CheckCircle2 size={20} /> : <Circle size={20} />}
@@ -194,12 +253,13 @@ export default function Timetable() {
             </div>
           ) : (
             <div>
-              <div className="grid grid-cols-7 gap-1 mb-2">
+              <div className="overflow-x-auto">
+              <div className="grid grid-cols-7 gap-1 mb-2 min-w-[280px]">
                 {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
                   <div key={d} className="text-center text-xs font-medium text-stone-500 py-2">{d}</div>
                 ))}
               </div>
-              <div className="grid grid-cols-7 gap-1">
+              <div className="grid grid-cols-7 gap-1 min-w-[280px]">
                 {Array.from({ length: firstDay }).map((_, i) => <div key={`empty-${i}`} />)}
                 {Array.from({ length: daysInMonth }).map((_, i) => {
                   const day = i + 1;
@@ -225,6 +285,7 @@ export default function Timetable() {
                     </button>
                   );
                 })}
+              </div>
               </div>
             </div>
           )}
@@ -266,9 +327,25 @@ export default function Timetable() {
             )}
           </div>
 
-          <button className="mt-6 w-full py-3 bg-gradient-to-r from-fuchsia-500 to-purple-600 text-white rounded-xl font-bold hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-lg shadow-fuchsia-500/20">
-            <Sparkles size={16} /> Generate AI Plan
+          <button
+            onClick={generateAiPlan}
+            disabled={aiLoading}
+            className="mt-6 w-full py-3 bg-gradient-to-r from-fuchsia-500 to-purple-600 text-white rounded-xl font-bold hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-lg shadow-fuchsia-500/20 disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {aiLoading ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
+            {aiLoading ? 'Generating...' : 'Generate AI Plan'}
           </button>
+
+          {aiError && (
+            <p className="mt-3 text-xs text-red-400 bg-red-500/10 rounded-xl p-3 border border-red-500/20">{aiError}</p>
+          )}
+
+          {aiPlanText && (
+            <div className="mt-4 bg-fuchsia-500/5 rounded-2xl p-4 border border-fuchsia-500/20">
+              <p className="text-xs font-bold text-fuchsia-400 mb-2 flex items-center gap-1"><Sparkles size={12} /> AI Suggestions</p>
+              <div className="text-sm text-stone-300 whitespace-pre-wrap leading-relaxed">{aiPlanText}</div>
+            </div>
+          )}
         </div>
       </div>
 

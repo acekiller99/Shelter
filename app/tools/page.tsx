@@ -218,12 +218,13 @@ export default function Tools() {
         {showModal && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            role="dialog" aria-modal="true" aria-labelledby="tool-modal-title"
             onClick={e => e.target === e.currentTarget && closeModal()}>
             <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
-              className="bg-stone-900 rounded-3xl border border-stone-700 p-6 w-full max-w-lg shadow-2xl">
+              className="bg-stone-900 rounded-3xl border border-stone-700 p-6 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-white">{editingTool ? 'Edit Tool' : 'Add New Tool'}</h2>
-                <button onClick={closeModal} className="p-2 text-stone-400 hover:text-white hover:bg-stone-800 rounded-full transition-colors"><X size={20} /></button>
+                <h2 id="tool-modal-title" className="text-xl font-bold text-white">{editingTool ? 'Edit Tool' : 'Add New Tool'}</h2>
+                <button onClick={closeModal} aria-label="Close dialog" className="p-2 text-stone-400 hover:text-white hover:bg-stone-800 rounded-full transition-colors"><X size={20} /></button>
               </div>
               <div className="space-y-4">
                 {[

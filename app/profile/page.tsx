@@ -263,13 +263,13 @@ export default function Profile() {
                   <li className="flex items-center gap-3 text-stone-300">
                     <MapPin size={18} className="text-stone-500 shrink-0" />
                     {isEditing ? (
-                      <input value={editData.location} onChange={e => setEditData(p => ({ ...p, location: e.target.value }))} className="bg-stone-700 rounded-lg px-2 py-1 text-sm text-white w-full focus:outline-none" />
+                      <input value={editData.location} onChange={e => setEditData(p => ({ ...p, location: e.target.value }))} className="bg-stone-700 rounded-lg px-2 py-1 text-sm text-white min-w-0 flex-1 focus:outline-none" />
                     ) : <span>{currentUser.location}</span>}
                   </li>
                   <li className="flex items-center gap-3 text-stone-300">
                     <LinkIcon size={18} className="text-stone-500 shrink-0" />
                     {isEditing ? (
-                      <input value={editData.website} onChange={e => setEditData(p => ({ ...p, website: e.target.value }))} className="bg-stone-700 rounded-lg px-2 py-1 text-sm text-white w-full focus:outline-none" />
+                      <input value={editData.website} onChange={e => setEditData(p => ({ ...p, website: e.target.value }))} className="bg-stone-700 rounded-lg px-2 py-1 text-sm text-white min-w-0 flex-1 focus:outline-none" />
                     ) : <a href={`https://${currentUser.website}`} className="text-amber-400 hover:underline truncate">{currentUser.website}</a>}
                   </li>
                   <li className="flex items-center gap-3 text-stone-300">

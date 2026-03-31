@@ -3,11 +3,13 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import Image from 'next/image';
-import { BellRing, Gamepad2, MonitorPlay, Moon, CircleDot } from 'lucide-react';
+import { BellRing, Gamepad2, MonitorPlay, Moon, CircleDot, UserCheck, UserMinus } from 'lucide-react';
+import { useGlobal } from './GlobalContext';
 
 export function UserHoverCard({ user, children }: { user: any, children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const { followedUsers, toggleFollow, currentUser } = useGlobal();
 
   const handleMouseEnter = () => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -74,6 +76,19 @@ export function UserHoverCard({ user, children }: { user: any, children: React.R
                   <BellRing size={16} />
                   Nudge
                 </button>
+                {user.handle !== currentUser.handle && (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); toggleFollow(user.handle); }}
+                    className={`w-full mt-2 py-2 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-colors border ${
+                      followedUsers.has(user.handle)
+                        ? 'bg-stone-800 text-stone-300 border-stone-600 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30'
+                        : 'bg-amber-500/10 text-amber-400 border-amber-500/30 hover:bg-amber-500/20'
+                    }`}
+                  >
+                    {followedUsers.has(user.handle) ? <UserMinus size={16} /> : <UserCheck size={16} />}
+                    {followedUsers.has(user.handle) ? 'Unfollow' : 'Follow'}
+                  </button>
+                )}
               </div>
             </div>
           </motion.div>

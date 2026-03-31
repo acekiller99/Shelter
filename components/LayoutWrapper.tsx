@@ -37,7 +37,7 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
       ) : (
         <div className="flex min-h-screen">
           <Sidebar />
-          <main className="flex-1 md:ml-64 min-h-screen">
+          <main className="flex-1 md:ml-64 min-h-screen pt-14 md:pt-0">
             <PageTransition pathname={pathname}>{children}</PageTransition>
           </main>
           <FloatingChat />
